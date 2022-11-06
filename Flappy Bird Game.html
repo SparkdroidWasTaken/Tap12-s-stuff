@@ -1,5 +1,6 @@
 <title>Flappy Bird</title>
 <canvas id="box" width="500" height="500" style="border:0px solid black"></canvas>
+<meta name="viewport" content="user-scalable=no">
 </canvas>
 <style>
 body{
@@ -8,6 +9,14 @@ overflow: hidden;
 }
 </style>
 <script>
+var IsMobile = false
+if(navigator.userAgentData.mobile == false){
+    console.log("YOU'RE ON PC")
+    IsMobile = false
+}else{
+    console.log("a mobile user i see")
+    IsMobile = true
+}
   var box = document.getElementById("box")
   box.width = innerWidth
   box.height = innerHeight
@@ -85,10 +94,18 @@ class Pipe{
     //pips
     let pipes = []
     pipes.push(new Pipe())
-    document.addEventListener("keypress",()=>{
+    if(!IsMobile){
+        document.addEventListener("keypress",()=>{
         birdy.flap()
         console.log("UP")
     })
+    }
+    if(IsMobile){
+        document.addEventListener("touchstart",()=>{
+        birdy.flap()
+        console.log("UP")
+    })
+    }
     function GameOver(){
         pipes = []
         window.localStorage.setItem("HighScoreFlappyBird",highscore)
