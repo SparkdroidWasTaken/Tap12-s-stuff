@@ -1,0 +1,194 @@
+<title>Platform Hop</title>
+<canvas id="box" width="500" height="500" style="border:0px solid black">
+<img id="Character"src="GameBoi.png">
+<img id="plattom" src="Platform.png">
+</canvas>
+<style>
+body{
+margin:0;
+overflow: hidden;
+}
+</style>
+<script>
+var box = document.getElementById("box")
+box.width = innerWidth
+box.height = innerHeight
+pen = box.getContext("2d")
+var character = document.getElementById("Character")
+var Plotform = document.getElementById("plattom")
+var left = false
+var right = false
+var up = false
+var StartSpeed = 100
+var speed = StartSpeed
+var Difficultly = 1
+var score = 0
+var highscore = 0
+if(localStorage.getItem("highscore")){
+    highscore = localStorage.getItem("highscore")
+}
+var FrameCount = 0
+document.addEventListener("keydown",function(press){
+    if(press.keyCode == 39){
+        right = true
+    }
+    if(press.keyCode == 37){
+        left = true
+    }
+    if(press.keyCode == 38 || press.keyCode == 32){
+        up = true
+    }
+})
+document.addEventListener("keyup",function(){
+    left = false
+    right = false
+    up = false
+})
+//PLAYER
+class Player{
+    constructor(){
+        this.x = box.width - 50
+        this.y = 250
+        this.width = 20
+        this.height = 20
+        this.left = this.x
+        this.right = this.x + this.width
+        this.up = this.y
+        this.down = this.y + this.height
+        this.color = "blue"
+        this.X_velocity = 0
+        this.Y_velocity = 0
+        this.Movespeed = 0.75
+        this.IsOnPlatform = true
+    }
+    draw(){
+        //pen.fillStyle = this.color
+        //pen.fillRect(this.x,this.y,this.width,this.height)
+        pen.drawImage(character, this.x, this.y)
+    }
+    jump(){
+        if(this.IsOnPlatform == true){
+            this.Y_velocity -= 10
+            this.y += this.Y_velocity
+            this.IsOnPlatform = false
+        }
+    }
+    update(){
+        this.draw()
+        //remember the parts
+        this.x = this.x
+        this.y = this.y
+        this.left = this.x
+        this.right = this.x + this.width
+        this.up = this.y
+        this.down = this.y + this.height
+        this.x += this.X_velocity
+
+        if(this.y < box.height){
+            this.Y_velocity +=0.5
+            this.y += this.Y_velocity
+        }
+        if(right == true){
+            this.X_velocity +=this.Movespeed
+        }
+        if(left == true){
+            this.X_velocity -=this.Movespeed
+        }
+        if(up == true){
+            this.jump()
+        }
+    }
+}
+
+var boi = new Player()
+
+class Platform{
+    constructor(x, y){
+        this.x =  x//box.width
+        this.y = y//Math.random() * box.height
+        this.width = 80
+        this.height = 20
+        this.left = this.x
+        this.right = this.x + this.width
+        this.up = this.y
+        this.down = this.y + this.height
+        this.color = "green"
+        this.X_velocity = 0
+        this.Movespeed = Difficultly
+    }
+    draw(){
+        pen.fillStyle = this.color
+        pen.fillRect(this.x,this.y,this.width,this.height)
+        pen.drawImage(Plotform, this.x, this.y)
+    }
+    update(){
+        this.draw()
+        this.x = this.x
+        this.y = this.y
+        this.left = this.x
+        this.right = this.x + this.width
+        this.up = this.y
+        this.down = this.y + this.height
+        this.X_velocity = this.Movespeed
+        this.x -= this.X_velocity
+        this.x = this.x
+    }
+}
+var platforms = []
+for (let i = 0; i < 1; i++) {
+    platforms.push(new Platform(boi.x, boi.down))
+    
+}
+function game(){
+    pen.imageSmoothingEnabled = false
+    pen.fillStyle = "rgb(135,206,235)"
+    pen.fillRect(0,0,box.width,box.height)
+    boi.update()
+    boi.X_velocity *=0.9
+    for (let i = 0; i < platforms.length; i++) {
+        platforms[i].update()
+        
+    }
+    pen.fillStyle = "black"
+    pen.font= "20px Arial";
+    pen.fillText("score:"+score,0,20)
+    pen.fillText("highscore:"+highscore,0,40)
+    if(score > highscore){
+        highscore = score
+    }
+    FrameCount++
+    if(FrameCount % 30 == 0){
+        platforms.push(new Platform(box.width,Math.random() * box.height))
+        score++
+        for (let i = 0; i < platforms.length; i++) {
+            Difficultly +=0.001
+        }
+
+    }
+    speed --
+    for (let i = 0; i < platforms.length; i++) {
+        if(boi.down >= platforms[i].up && boi.right >= platforms[i].left && platforms[i].right >= boi.left && platforms[i].down >= boi.up){
+            boi.IsOnPlatform = true
+                boi.Y_velocity = 0
+                boi.y = platforms[i].y - boi.height
+                boi.x -= platforms[i].X_velocity
+                if(up == true){
+                    boi.jump()
+                }
+        }
+    }
+    for (let i = 0; i < platforms.length; i++) {
+        if(platforms[i].right < 0){
+            platforms.splice(i,1)
+        }
+        
+    }
+    requestAnimationFrame(game)
+    if(boi.y > box.height){
+        window.localStorage.setItem("highscore",highscore)
+        location.reload()
+    }
+}
+game()
+//window.localStorage.removeItem("highscore")
+</script>

@@ -1,0 +1,154 @@
+<title>Flappy Bird</title>
+<canvas id="box" width="500" height="500" style="border:0px solid black"></canvas>
+</canvas>
+<style>
+body{
+margin:0;
+overflow: hidden;
+}
+</style>
+<script>
+  var box = document.getElementById("box")
+  box.width = innerWidth
+  box.height = innerHeight
+  pen = box.getContext("2d")
+  pen.fillStyle = "rgba(100,100,255,1)"
+  pen.fillRect(0,0,box.width,box.height)
+  //keeping score
+  let score = 0
+  let highscore = 0
+  if(localStorage.getItem("HighScoreFlappyBird")){
+    highscore = localStorage.getItem("HighScoreFlappyBird")
+}
+  //timer for spawning pipes
+  let timer = 0
+  let closeness = 175
+  //the bird is a CUBE
+  class bird{
+    constructor(type){
+        this.x = 300
+        this.y = 20//box.height/2
+        this.width = 20
+        this.height = 20
+        this.color = "yellow"
+        this.gravity = 1
+        this.y_speed = 0
+        this.UpForce = 15
+        this.type = type
+    }
+    draw(){
+        pen.fillStyle = this.color
+        pen.fillRect(this.x,this.y,this.width,this.height)
+        //the eye
+        pen.beginPath()
+        pen.fillStyle = "black"
+        pen.arc((this.x+this.width/2)+(this.width/4),(this.y+this.height/2)-(this.height/8),4,Math.PI,0)
+        pen.fill()
+        pen.beginPath()
+        pen.fillStyle = "white"
+        pen.arc((this.x+this.width/2)+(this.width/6),(this.y+this.height/2)-(this.height/5),2,0,2*Math.PI)
+        pen.fill()
+    }
+    update(){
+        this.y_speed+= this.gravity
+        this.y_speed *=0.9
+        this.y += this.y_speed
+    }
+    flap(){
+        this.y_speed -= this.UpForce
+    }
+}
+//THE PIPE
+class Pipe{
+    constructor(){
+        this.x = box.width
+        this.HasCollectedScore = false
+        this.top_height = Math.floor(Math.random() * ((box.height/2) - (box.height/35)+1) + (box.height/35))
+        this.top_y = 300
+        this.spacing = 150
+        this.bottom_y = this.top_height+this.spacing
+        this.width = 150
+        this.bottom_height = box.height-(this.top_height+this.spacing)
+        this.color = "rgb(100,255,100)"
+    }
+    draw(){
+        pen.fillStyle = this.color
+        pen.fillRect(this.x,0,this.width,this.top_height)
+        pen.fillRect(this.x,this.bottom_y,this.width,this.bottom_height)
+    }
+    update(){
+        this.x -= 3
+    }
+}
+//BIRD
+    let birdy = new bird()
+    //pips
+    let pipes = []
+    pipes.push(new Pipe())
+    document.addEventListener("keypress",()=>{
+        birdy.flap()
+        console.log("UP")
+    })
+    function GameOver(){
+        pipes = []
+        window.localStorage.setItem("HighScoreFlappyBird",highscore)
+        score = 0
+        birdy.x = 300
+        birdy.y = 20
+        timer = 0
+    }
+    //this is the game
+    function game(){
+        pen.fillStyle = "rgba(100,100,255,1)"
+        pen.fillRect(0,0,box.width,box.height)
+        //updating stuff
+        timer++
+        birdy.update()
+        for(let i = 0; i < pipes.length; i++){
+            pipes[i].update()
+            if(pipes[i].x < -pipes[i].width){
+                pipes.splice(i,1)
+            }
+            //checking if the player has passed the pipe
+            if(birdy.x > pipes[i].x && Math.abs(birdy.x-pipes[i].x) >=pipes[i].width && !pipes[i].HasCollectedScore){
+                score++
+                pipes[i].HasCollectedScore = true
+            }
+            //checking if the bird has hit the pipe
+            if(pipes.length >= 1){
+                //touches the top pipe
+                if(birdy.x+birdy.width >= pipes[i].x && birdy.x <= pipes[i].x+pipes[i].width && 0 <= birdy.y+birdy.height&& birdy.y <= 0+pipes[i].top_height){
+                    GameOver()
+                    console.log("top")
+                }
+                //touching the bottom pipe
+                 else if(birdy.x+birdy.width >= pipes[i].x && birdy.x <= pipes[i].x+pipes[i].width && pipes[i].bottom_y <= birdy.y+birdy.height&& birdy.y <= pipes[i].bottom_y+pipes[i].bottom_height){
+                    GameOver()
+                    console.log("bottom")
+                }
+            }
+        }
+        //checking if the player has touched the floor or went too high
+        if(birdy.y <= 0 || birdy.y >= box.height){
+            GameOver()
+        }
+        if(timer % closeness == 0){
+            pipes.push(new Pipe())
+        }
+        //drawing the graphics
+        birdy.draw()
+        for(let i = 0; i < pipes.length; i++){
+            pipes[i].draw()
+        }
+        pen.fillStyle = "black"
+        pen.font= "20px Arial";
+        pen.fillText("score:"+score,0,20)
+        pen.fillText("highscore:"+highscore,0,40)
+        if(score > highscore){
+            highscore = score
+        }
+
+        requestAnimationFrame(game)
+    }
+    game()
+</script>
