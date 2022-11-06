@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html id="BACKGROUND BOIS">
+    <head>
+        <title>website</title>
+        <script>
+            //finally, something I know how to use
+            function FlappyBirdInformation(){
+                document.getElementById("FBI").innerText = "Wanna play my version of flappy bird? \n use the spacebar to jump and see what highscore you get"
+            }
+            function ClearFlappyBirdInformation(){
+                document.getElementById("FBI").innerText = ""
+            }
+            function PlatformHopInformation(){
+                document.getElementById("PHI").innerText = "Platform Hop.\n A game I made where you jump onto platforms and try not to die \n use the arrow keys to move and jump"
+            }
+            function ClearPlatformHopInformation(){
+                document.getElementById("PHI").innerText = ""
+            }
+            //stuff for sqoob
+            function PleaseDontTouchSqoob(){
+                document.getElementById("boi").innerText = ">_<"
+                document.getElementById("SqoobText").innerText = "please do not touch Sqoob,\n He is very shy"
+            }
+            function ThankYouForNotTouchingSqoob(){
+                document.getElementById("boi").innerText = "O_O"
+                document.getElementById("SqoobText").innerText = ""
+            }
+        </script>
+        <style>
+            #FakeBody{
+                background-color: gold;
+                border: 10px solid rgb(0, 191, 255);
+                border-radius: 16px;
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 1024px;
+                min-width: 256px;
+                padding-top: 8px;
+                padding-bottom: 24px;
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+            html{
+                background: linear-gradient(yellow,cyan,pink);
+                background-size: 1024px 1024px;
+            }
+            #intro{
+                color:rgb(0, 255, 242);
+                font-size: 20px;
+                text-align: center;
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            }
+            p{
+                color:rgb(116, 0, 103);
+                font-size: 15px;
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            }
+            h1{
+                background-color: blueviolet;
+                text-align: center;
+                font-size: 50px;
+                color: aqua;
+            }
+            #FlappyBirdImage{
+                height: 186px;
+                width:220px;
+            }
+            /*IT'S SQOOB*/
+            #boi{
+                width: 20px;
+                height: 50px;
+                font-size:10px;
+                background-image:linear-gradient(yellow,pink);
+                position: absolute;
+                top: 130px;
+                transition: 1s;
+                animation-name: movingBoi;
+                animation-duration:2s;
+                animation-fill-mode:forwards;
+                animation-iteration-count:infinite;
+                animation-direction:alternate;
+                animation-timing-function:linear;
+            }
+            #SqoobText{
+                position: absolute;
+                top: 180px;
+            }
+            /*animations for sqoob */
+            @keyframes movingBoi{
+                from{transform: translateX(-0)}
+                to{transform:translateX(0%) rotate(180deg)}
+            }
+        </style>
+    </head>
+    <body>
+        <div id="FakeBody">
+        <h1>Hello!!!</h1>
+        <p id="intro">Welcome to my index website (it isn't gonna look good obviously)</p>
+        <p id="intro">Here's some of my stuff</p>
+        <a id="Flappy Bird" href="Flappy Bird Game.html" style="text-decoration: none;">
+            <img onmouseover ="FlappyBirdInformation()" onmouseout="ClearFlappyBirdInformation()"id="FlappyBirdImage" src="flappy bird image.png" alt="FlappyBird image">
+            <p id="FBI" style="display: inline-block;"></p>
+        </a>
+        <a id="Platform Hop" href="PlatformHop.html" style="text-decoration: none;">
+        <img onmouseover ="PlatformHopInformation()" onmouseout="ClearPlatformHopInformation()"id="PlatformHopImage" src="PlatformHop.png" alt="PlatformHop image">
+        <p id="PHI" style="display:inline-block;"></p>
+        </a>
+    </div>
+        <div id="boi" onmouseover ="PleaseDontTouchSqoob()"onmouseout="ThankYouForNotTouchingSqoob()">O_O</div>
+        <p id="SqoobText"></p>
+    </body>
+</html>
