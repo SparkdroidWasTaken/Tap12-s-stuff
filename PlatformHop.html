@@ -89,7 +89,9 @@ class button{
 if(IsMobile){
 var LeftButton = new button(0,box.height - 50, "blue", "left")
 var RightButton = new button(90,box.height - 50, "blue", "right")
-var JumpButton = new button(box.width - 50 ,box.height - 80, "green", "up")
+var JumpButton = new button(box.width - 80 ,box.height - 80, "green", "up")
+JumpButton.width = 80
+JumpButton.height = 80
 SpawnAreaY =box.height-JumpButton.height
 }
 //PLAYER
