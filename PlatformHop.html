@@ -1,20 +1,39 @@
 <title>Platform Hop</title>
 <canvas id="box" width="500" height="500" style="border:0px solid black">
 <img id="Character"src="GameBoi.png">
+<div id="box">
+<img id="CharacterFlipped"src="GameBoi.png">
 <img id="plattom" src="Platform.png">
+<meta name="viewport" content="user-scalable=no">
 </canvas>
 <style>
+#CharacterFlipped{
+-ms-transform: rotateX(180deg);
+  transform: scaleX(180);
+    }
+    /*u shouldn't be here bro*/
 body{
 margin:0;
 overflow: hidden;
 }
 </style>
 <script>
+//check if the user is on mobile
+var IsMobile;
+if(navigator.userAgentData.mobile == false){
+    console.log("YOU'RE ON PC")
+    IsMobile = false
+}else{
+    console.log("a mobile user i see")
+    IsMobile = true
+}
+//a few basic stats
 var box = document.getElementById("box")
 box.width = innerWidth
 box.height = innerHeight
 pen = box.getContext("2d")
 var character = document.getElementById("Character")
+var characterF = document.getElementById("CharacterFlipped")
 var Plotform = document.getElementById("plattom")
 var left = false
 var right = false
@@ -24,13 +43,16 @@ var speed = StartSpeed
 var Difficultly = 1
 var score = 0
 var highscore = 0
+var SpawnAreaY = box.height
 if(localStorage.getItem("highscore")){
     highscore = localStorage.getItem("highscore")
 }
 var FrameCount = 0
+//pc controls
 document.addEventListener("keydown",function(press){
     if(press.keyCode == 39){
         right = true
+        character.style
     }
     if(press.keyCode == 37){
         left = true
@@ -44,6 +66,32 @@ document.addEventListener("keyup",function(){
     right = false
     up = false
 })
+//button for mobile
+class button{
+    constructor(x,y,color,control){
+        this.x = x
+        this.y = y
+        this.height = 50
+        this.width = 50
+        this.right = this.x + this.width
+        this.down = this.y + this.height
+        this.control = control
+        this.color = color
+    }
+    draw(){
+        pen.fillStyle = this.color
+        pen.fillRect(this.x,this.y,this.width,this.height)
+    }
+    update(){
+        this.draw()
+    }
+}
+if(IsMobile){
+var LeftButton = new button(0,box.height - 50, "blue", "left")
+var RightButton = new button(90,box.height - 50, "blue", "right")
+var JumpButton = new button(box.width - 50 ,box.height - 50, "green", "up")
+SpawnAreaY =box.height-JumpButton.height
+}
 //PLAYER
 class Player{
     constructor(){
@@ -64,7 +112,7 @@ class Player{
     draw(){
         //pen.fillStyle = this.color
         //pen.fillRect(this.x,this.y,this.width,this.height)
-        pen.drawImage(character, this.x, this.y)
+            pen.drawImage(character, this.x, this.y)
     }
     jump(){
         if(this.IsOnPlatform == true){
@@ -139,15 +187,26 @@ for (let i = 0; i < 1; i++) {
     platforms.push(new Platform(boi.x, boi.down))
     
 }
+function restartGame(){
+    boi.X_velocity = 0
+    boi.Y_velocity = 0
+    score = 0
+    platforms = []
+    boi.x = box.width - 50
+    boi.y = 250
+    speed = StartSpeed
+    Difficultly = 1
+    platforms=[]
+    platforms.push(new Platform(box.width - 50, 250))
+}
 function game(){
+    pen.save()
     pen.imageSmoothingEnabled = false
     pen.fillStyle = "rgb(135,206,235)"
-    pen.fillRect(0,0,box.width,box.height)
-    boi.update()
-    boi.X_velocity *=0.9
-    for (let i = 0; i < platforms.length; i++) {
-        platforms[i].update()
-        
+    if(IsMobile){
+        pen.fillRect(0,0,box.width,SpawnAreaY+JumpButton.height)
+    }else{
+        pen.fillRect(0,0,box.width,SpawnAreaY)
     }
     pen.fillStyle = "black"
     pen.font= "20px Arial";
@@ -156,9 +215,42 @@ function game(){
     if(score > highscore){
         highscore = score
     }
+    if(window.innerHeight > window.innerWidth){
+        console.log("HAHA")
+        pen.fillStyle = "black"
+        pen.font = "20px Arial";
+        pen.fillText("you might want to rotate your device",(box.width/2)-140,box.height-40)
+    }
+    //mobile settings
+    if(IsMobile){
+        LeftButton.update()
+        RightButton.update()
+        JumpButton.update()
+        function controls(pew) {
+            var Controlx = pew.touches[0].clientX;
+            var Controly = pew.touches[0].clientY;
+            var RadiusX = pew.touches[0].radiusX;
+            var RadiusY = pew.touches[0].radiusY;
+            if (Controlx < LeftButton.x || Controlx > LeftButton.x + LeftButton.width || Controly < LeftButton.y || Controly > LeftButton.y + LeftButton.height) {}else{left = true}
+            if (Controlx < RightButton.x || Controlx > RightButton.x + RightButton.width || Controly < RightButton.y || Controly > RightButton.y + RightButton.height) {}else{right = true}
+            if (Controlx < JumpButton.x || Controlx > JumpButton.x + JumpButton.width || Controly < JumpButton.y || Controly > JumpButton.y + JumpButton.height) {}else{up = true}
+        }
+        document.addEventListener("touchstart",controls)
+        document.addEventListener("touchend",function(){
+        left = false
+        right = false
+        up = false
+    })
+    }
+    boi.update()
+    boi.X_velocity *=0.9
+    for (let i = 0; i < platforms.length; i++) {
+        platforms[i].update()
+        
+    }
     FrameCount++
     if(FrameCount % 30 == 0){
-        platforms.push(new Platform(box.width,Math.random() * box.height))
+        platforms.push(new Platform(box.width,Math.random() * (SpawnAreaY-20)))
         score++
         for (let i = 0; i < platforms.length; i++) {
             Difficultly +=0.001
@@ -184,10 +276,11 @@ function game(){
         
     }
     requestAnimationFrame(game)
-    if(boi.y > box.height){
+    if(boi.y > SpawnAreaY){
+        restartGame()
         window.localStorage.setItem("highscore",highscore)
-        location.reload()
     }
+    pen.restore()
 }
 game()
 //window.localStorage.removeItem("highscore")
